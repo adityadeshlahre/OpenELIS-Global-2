@@ -80,8 +80,6 @@ function TestNotificationConfigEdit() {
   ] = useState({});
   const [testNamesList, setTestNamesList] = useState([]);
   const [testName, setTestName] = useState("");
-  const [testNotificationConfigMenuList, setTestNotificationConfigMenuList] =
-    useState([]);
 
   useEffect(() => {
     if (testNotificationConfigEditData) {
@@ -831,13 +829,6 @@ function TestNotificationConfigEdit() {
           }}
         >
           testNotificationConfigEditDataPost
-        </button>
-        <button
-          onClick={() => {
-            console.log(testNotificationConfigMenuList);
-          }}
-        >
-          testNotificationConfigMenuList
         </button>
         <button
           onClick={() => {

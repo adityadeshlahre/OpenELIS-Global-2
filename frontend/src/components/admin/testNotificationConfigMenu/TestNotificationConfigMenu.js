@@ -67,7 +67,7 @@ function TestNotificationConfigMenu() {
   const [
     testNotificationConfigMenuDataPost,
     setTestNotificationConfigMenuDataPost,
-  ] = useState({ menuList: [] });
+  ] = useState({ menuList: [], selectedIDs: [] });
   const [testNamesMap, setTestNamesMap] = useState({});
 
   const handleMenuItems = (res) => {
@@ -111,12 +111,12 @@ function TestNotificationConfigMenu() {
         cancelAction: testNotificationConfigMenuData.cancelAction,
         submitOnCancel: testNotificationConfigMenuData.submitOnCancel,
         cancelMethod: testNotificationConfigMenuData.cancelMethod,
-        adminMenuItems: testNotificationConfigMenuData.adminMenuItems,
+        // adminMenuItems: testNotificationConfigMenuData.adminMenuItems,
         totalRecordCount: testNotificationConfigMenuData.totalRecordCount,
         fromRecordCount: testNotificationConfigMenuData.fromRecordCount,
         toRecordCount: testNotificationConfigMenuData.toRecordCount,
-        selectedIDs: testNotificationConfigMenuData.selectedIDs,
-        menuList: testNotificationConfigMenuData.menuList,
+        selectedIDs: testNotificationConfigMenuData.selectedIDs || [],
+        menuList: testNotificationConfigMenuData.menuList || [],
       }));
     }
   }, [testNotificationConfigMenuData]);
@@ -139,7 +139,7 @@ function TestNotificationConfigMenu() {
     setLoading(true);
     postToOpenElisServerJsonResponse(
       `/rest/TestNotificationConfigMenu`,
-      JSON.stringify(testNotificationConfigMenuDataPost.menuList),
+      JSON.stringify(testNotificationConfigMenuDataPost),
       (res) => {
         testNotificationConfigMenuSavePostCallBack(res);
       },
@@ -159,9 +159,9 @@ function TestNotificationConfigMenu() {
         kind: NotificationKinds.success,
       });
       setNotificationVisible(true);
-      setTimeout(() => {
-        window.location.reload();
-      }, 200);
+      // setTimeout(() => {
+      //   window.location.reload();
+      // }, 200);
     } else {
       addNotification({
         kind: NotificationKinds.error,
@@ -180,7 +180,7 @@ function TestNotificationConfigMenu() {
 
     setTestNotificationConfigMenuDataPost((prevData) => {
       const updatedMenuList = prevData.menuList.map((item) => {
-        if (item.id === rowId) {
+        if (item.testId === rowId) {
           switch (header) {
             case "patientEmail":
               return {
@@ -209,9 +209,63 @@ function TestNotificationConfigMenu() {
         return item;
       });
 
+      // const updatedSelectedIDs = isChecked
+      //   ? [...new Set([...prevData?.selectedIDs, rowId])]
+      //   : prevData?.selectedIDs.filter((id) => id !== rowId); // testID
+
+      // const updatedSelectedIDs = isChecked
+      //   ? [
+      //       ...new Set([
+      //         ...prevData.selectedIDs,
+      //         ...prevData.menuList
+      //           .filter((item) => item.testId === rowId)
+      //           .map((item) => item.id),
+      //       ]),
+      //     ]
+      //   : prevData.selectedIDs.filter(
+      //       (id) =>
+      //         !prevData.menuList.find(
+      //           (item) => item.testId === rowId && item.id === id,
+      //         ),
+      //     ); // id
+
+      const idsToUpdate = updatedMenuList
+        .filter((item) => item.testId === rowId)
+        .flatMap((item) => {
+          const ids = [];
+          if (header === "patientEmail" && item.patientEmail.active) {
+            ids.push(item.patientEmail.id);
+          }
+          if (header === "patientSMS" && item.patientSMS.active) {
+            ids.push(item.patientSMS.id);
+          }
+          if (header === "providerEmail" && item.providerEmail.active) {
+            ids.push(item.providerEmail.id);
+          }
+          if (header === "providerSMS" && item.providerSMS.active) {
+            ids.push(item.providerSMS.id);
+          }
+          return ids;
+        });
+
+      const updatedSelectedIDs = isChecked
+        ? [...new Set([...prevData.selectedIDs, ...idsToUpdate])]
+        : prevData.selectedIDs.filter(
+            (id) =>
+              !updatedMenuList.some(
+                (item) =>
+                  item.testId === rowId &&
+                  (item.patientEmail.id === id ||
+                    item.patientSMS.id === id ||
+                    item.providerEmail.id === id ||
+                    item.providerSMS.id === id),
+              ),
+          ); // setting ppSMSEMIAL : id insider
+
       return {
         ...prevData,
         menuList: updatedMenuList,
+        selectedIDs: updatedSelectedIDs,
       };
     });
   };
@@ -343,9 +397,10 @@ function TestNotificationConfigMenu() {
                 // )}
                 rows={
                   testNotificationConfigMenuDataPost?.menuList
-                    ?.slice((page - 1) * pageSize, page * pageSize)
+                    // ?.slice((page - 1) * pageSize, page * pageSize)
                     ?.map((item) => ({
-                      id: item.id,
+                      // id: `${item.testId}-${index}`,
+                      id: item.testId,
                       testId: item.testId,
                       patientEmail: item.patientEmail.active ? "true" : "false",
                       patientSMS: item.patientSMS.active ? "true" : "false",
@@ -495,7 +550,7 @@ function TestNotificationConfigMenu() {
                   </TableContainer>
                 )}
               </DataTable>
-              <Pagination
+              {/* <Pagination
                 onChange={handlePageChange}
                 page={page}
                 pageSize={pageSize}
@@ -537,7 +592,7 @@ function TestNotificationConfigMenu() {
                     { page: pagesUnknown ? "" : page },
                   )
                 }
-              />
+              /> */}
               <br />
             </Column>
           </Grid>

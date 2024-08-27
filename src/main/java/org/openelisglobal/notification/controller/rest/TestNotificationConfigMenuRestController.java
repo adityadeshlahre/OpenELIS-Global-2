@@ -61,7 +61,7 @@ public class TestNotificationConfigMenuRestController extends BaseMenuController
 
     @PostMapping("/TestNotificationConfigMenu")
     public TestNotificationConfigMenuForm updateNotificationConfig(
-            @RequestBody @Valid TestNotificationConfigMenuForm form, BindingResult result) {
+            @RequestBody @Valid TestNotificationConfigMenuForm form, BindingResult result, HttpServletRequest request) {
         if (result.hasErrors()) {
             // saveErrors(result);
             // return displayNotificationConfig();

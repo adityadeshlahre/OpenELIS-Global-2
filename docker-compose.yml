@@ -1,9 +1,7 @@
-version: '3.3'
 services:
     certs:
         container_name: oe-certs 
         image: itechuw/certgen:main
-        restart: always
         environment:
             - KEYSTORE_PW="kspass"
             - TRUSTSTORE_PW="tspass"
@@ -19,7 +17,6 @@ services:
         image: postgres:14.4
         ports:
             - "15432:5432"
-        restart: always
         env_file:
             - ./volume/database/database.env
         volumes:
@@ -44,10 +41,9 @@ services:
         ports:
             - "8080:8080"
             - "8443:8443"
-        restart: always
         networks:
           default:
-              ipv4_address: 172.20.1.121
+              ipv4_address: 192.20.1.121
 
         environment:
             - DEFAULT_PW=adminADMIN! 
@@ -76,7 +72,6 @@ services:
             - "8444:8443"
         networks:
             - default
-        restart: always
         environment:
           SPRING_CONFIG_LOCATION: file:///run/secrets/hapi_application.yaml
           TZ: Africa/Nairobi
@@ -117,7 +112,6 @@ services:
             - ./volume/nginx/nginx-prod.conf:/etc/nginx/nginx.conf:ro
         networks:
             - default
-        restart: unless-stopped
         depends_on:
         - certs        
             
@@ -134,7 +128,7 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.20.1.0/24  
+        - subnet: 192.20.1.0/24  
         
 volumes:
   db-data:

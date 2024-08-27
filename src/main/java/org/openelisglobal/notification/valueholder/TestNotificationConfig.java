@@ -2,6 +2,7 @@ package org.openelisglobal.notification.valueholder;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -25,6 +26,7 @@ import org.openelisglobal.test.valueholder.Test;
 
 @Entity
 @Table(name = "test_notification_config")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TestNotificationConfig extends NotificationConfig<Test> {
 
     private static final long serialVersionUID = -3516692281036957868L;

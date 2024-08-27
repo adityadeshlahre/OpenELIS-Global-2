@@ -1,4 +1,3 @@
-version: '3.3'
 services:
     oe.openelis.org:
         container_name: openelisglobal-webapp 
